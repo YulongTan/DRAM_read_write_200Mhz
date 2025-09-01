@@ -180,9 +180,24 @@ module test_write_read(
     wire [7:0] DRAM_DATA_OUT16;
     wire RD_DONE;
     wire WT_DONE;
-    // LED指示灯，高电平亮
-    assign RD_DONE_LED = RD_DONE;
-    assign WT_DONE_LED = WT_DONE;
+
+    // LED指示灯：DONE信号拉高后保持亮
+    reg rd_done_latch;
+    reg wt_done_latch;
+    assign RD_DONE_LED = rd_done_latch;
+    assign WT_DONE_LED = wt_done_latch;
+
+    always @(posedge clk_100m or negedge rst_n_locked) begin
+        if (!rst_n_locked) begin
+            rd_done_latch <= 1'b0;
+            wt_done_latch <= 1'b0;
+        end else begin
+            if (RD_DONE)
+                rd_done_latch <= 1'b1;
+            if (WT_DONE)
+                wt_done_latch <= 1'b1;
+        end
+    end
     
 
     always @(posedge clk_100m or negedge rst_n) begin
