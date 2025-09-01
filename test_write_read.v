@@ -23,7 +23,7 @@
 module test_write_read(
     input wire clk,  // 100MHz
     input wire rst_n, 
-    input wire IO_EN, 
+    input wire IO_EN_button, 
     // input wire [1:0] IO_MODEL, // IO模型选择
     input wire [16:1] DRAM16_data, // DRAM芯片输入数据
     output reg RD_DONE_LED, // DRAM_DATA_OUT done信号
