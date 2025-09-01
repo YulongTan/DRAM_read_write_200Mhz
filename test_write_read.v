@@ -24,10 +24,10 @@ module test_write_read(
     input wire clk,  // 100MHz
     input wire rst_n, 
     input wire IO_EN, 
-    input wire [1:0] IO_MODEL,
-    input wire [16:1] DRAM16_data,
-    output wire RD_DONE, // DRAM_DATA_OUT done信号
-    output wire WT_DONE, // DRAM写入完成done信号
+    // input wire [1:0] IO_MODEL, // IO模型选择
+    input wire [16:1] DRAM16_data, // DRAM芯片输入数据
+    output reg RD_DONE_LED, // DRAM_DATA_OUT done信号
+    output reg WT_DONE_LED, // DRAM写入完成done信号
     // DRAM_IO
     // IO数据DRAM➡FPGA
     // input wire [8:1] DRAM_data, // 单芯片
@@ -47,7 +47,8 @@ module test_write_read(
     output wire DE_ADD3,           /// DE_ADD3
     output wire RD_EN,         // 读使能 RWL_EN
     output wire VSAEN,
-    output wire REF_WWL
+    output wire REF_WWL,
+    output wire uart_txd        // 串口发送脚
 );
     // generate clock
     wire clk_400m;
@@ -66,6 +67,8 @@ module test_write_read(
     );
     // 信号定义
     
+    // reg 
+    reg [1:0] IO_MODEL;
     reg [1:0] CIM_model;
     reg [16:1] DATA_IN;
     reg [63:0] WBL_DATA_IN1;
@@ -136,10 +139,32 @@ module test_write_read(
     wire [7:0] DRAM_DATA_OUT14;
     wire [7:0] DRAM_DATA_OUT15;
     wire [7:0] DRAM_DATA_OUT16;
+    wire RD_DONE;
+    wire WT_DONE;
+    // LED指示灯
+    // assign RD_DONE_LED = RD_DONE;
+    // assign WT_DONE_LED = WT_DONE;
+    always @(posedge clk_100m or negedge rst_n) begin
+        if (!rst_n) begin
+            RD_DONE_LED <= 1'b0;
+            WT_DONE_LED <= 1'b0;
+        end else begin
+            if (RD_DONE) begin
+                RD_DONE_LED <= 1'b1;
+            end
+            if (WT_DONE) begin
+                WT_DONE_LED <= 1'b1;
+            end
+        end
+    end
+    
 
     always @(posedge clk_100m or negedge rst_n) begin
         if (!rst_n) begin
             // 初始化所有寄存器
+            // 读写控制
+            IO_MODEL <= 2'b00;
+            //
             CIM_model <= 2'b10;
             DATA_IN <= 16'hffff;
             WBL_DATA_IN1 <=  64'b0;
@@ -194,6 +219,8 @@ module test_write_read(
             DEMUX_ADD_3 <= 1'b0;
         end
         else begin
+            IO_MODEL <= 2'b01;
+            //
             CIM_model <= 2'b10;
             DATA_IN <= 16'hffff;
             WBL_DATA_IN1 <=  {{8{8'b0101_0101}}};
@@ -346,6 +373,77 @@ module test_write_read(
         .VSAEN(VSAEN),
         .REF_WWL(REF_WWL)
     );
+
+    // 串口发送逻辑
+    wire uart_busy;
+    reg uart_en;
+    reg [7:0] uart_data;
+    reg [5:0] send_idx;
+    reg sending;
+
+    uart_send u_uart (
+        .clk(clk_100m),
+        .uart_en(uart_en),
+        .uart_din(uart_data),
+        .uart_txd(uart_txd),
+        .uart_busy(uart_busy)
+    );
+
+    always @(posedge clk_100m or negedge rst_n_locked) begin
+        if (!rst_n_locked) begin
+            uart_en   <= 1'b0;
+            uart_data <= 8'b0;
+            send_idx  <= 6'd0;
+            sending   <= 1'b0;
+        end else begin
+            uart_en <= 1'b0;
+            if (RD_DONE && !sending) begin
+                sending  <= 1'b1;
+                send_idx <= 6'd0;
+            end else if (sending && !uart_busy) begin
+                uart_en <= 1'b1;
+                case (send_idx)
+                    6'd0:  uart_data <= DRAM_DATA_OUT1;
+                    6'd1:  uart_data <= 8'h0A;
+                    6'd2:  uart_data <= DRAM_DATA_OUT2;
+                    6'd3:  uart_data <= 8'h0A;
+                    6'd4:  uart_data <= DRAM_DATA_OUT3;
+                    6'd5:  uart_data <= 8'h0A;
+                    6'd6:  uart_data <= DRAM_DATA_OUT4;
+                    6'd7:  uart_data <= 8'h0A;
+                    6'd8:  uart_data <= DRAM_DATA_OUT5;
+                    6'd9:  uart_data <= 8'h0A;
+                    6'd10: uart_data <= DRAM_DATA_OUT6;
+                    6'd11: uart_data <= 8'h0A;
+                    6'd12: uart_data <= DRAM_DATA_OUT7;
+                    6'd13: uart_data <= 8'h0A;
+                    6'd14: uart_data <= DRAM_DATA_OUT8;
+                    6'd15: uart_data <= 8'h0A;
+                    6'd16: uart_data <= DRAM_DATA_OUT9;
+                    6'd17: uart_data <= 8'h0A;
+                    6'd18: uart_data <= DRAM_DATA_OUT10;
+                    6'd19: uart_data <= 8'h0A;
+                    6'd20: uart_data <= DRAM_DATA_OUT11;
+                    6'd21: uart_data <= 8'h0A;
+                    6'd22: uart_data <= DRAM_DATA_OUT12;
+                    6'd23: uart_data <= 8'h0A;
+                    6'd24: uart_data <= DRAM_DATA_OUT13;
+                    6'd25: uart_data <= 8'h0A;
+                    6'd26: uart_data <= DRAM_DATA_OUT14;
+                    6'd27: uart_data <= 8'h0A;
+                    6'd28: uart_data <= DRAM_DATA_OUT15;
+                    6'd29: uart_data <= 8'h0A;
+                    6'd30: uart_data <= DRAM_DATA_OUT16;
+                    6'd31: uart_data <= 8'h0A;
+                    default: uart_data <= 8'h00;
+                endcase
+                send_idx <= send_idx + 1'b1;
+                if (send_idx == 6'd31) begin
+                    sending <= 1'b0;
+                end
+            end
+        end
+    end
 
     // 后续可添加initial块进行仿真激励
 
