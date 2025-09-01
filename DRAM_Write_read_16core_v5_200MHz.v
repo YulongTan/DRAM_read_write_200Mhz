@@ -23,6 +23,7 @@
 module DRAM_write_read_16core(
     input wire clk_100m,
     input wire clk_200m,
+    input wire clk_vsa,
     input wire rst_n,
     // 使能读写
     input IO_EN, 
@@ -2557,25 +2558,28 @@ module DRAM_write_read_16core(
     assign LIM_IN=DATA_IN_r;     // LIM_IN, LIM输入 16块芯片的算输入数据
     assign LIM_SEL=CIM_model_r;  // 存算模式选择
     // 插入逻辑门延时  具体延时多少是试出来的
-    //read delay generate
-    (*dont_touch="yes"*)wire RD_EN1;
-    (*dont_touch="yes"*)wire RD_EN2;
-    (*dont_touch="yes"*)wire RD_EN3;
-    (*dont_touch="yes"*)wire RD_EN4;
-    (*dont_touch="yes"*)wire RD_EN5;
-    (*dont_touch="yes"*)wire RD_EN6;
-    (*dont_touch="yes"*)assign RD_EN1=RD_EN_pre&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN2=RD_EN1&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN3=RD_EN2&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN4=RD_EN3&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN=RD_EN4&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN5=RD_EN&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN6=RD_EN5&(!WR_flag);
-    //(*dont_touch="yes"*)assign VSAEN=RD_EN6&(!WR_flag);
-    (*dont_touch="yes"*)wire RD_EN7;
-    (*dont_touch="yes"*)wire RD_EN8;
-    (*dont_touch="yes"*)assign RD_EN7=RD_EN6&(!WR_flag);
-    (*dont_touch="yes"*)assign RD_EN8=RD_EN7&(!WR_flag);
-    (*dont_touch="yes"*)assign VSAEN=RD_EN8&(!WR_flag);
+    reg RD_EN_r;
+    always @(posedge clk_200m or negedge rst_n) begin
+        if(!rst_n) begin
+            RD_EN_r <= 1'b0;
+        end
+        else begin
+            RD_EN_r <= RD_EN_pre & (~WR_flag);
+        end
+    end
+    assign RD_EN = RD_EN_r;
+    reg VSAEN_r;
+    reg VSAEN_nr1;
+    always @(posedge clk_vsa or negedge rst_n) begin
+        if(!rst_n) begin
+            VSAEN_r <= 1'b0;
+            VSAEN_nr1 <= 1'b0;
+        end
+        else begin
+            VSAEN_nr1 <= RD_EN;
+            VSAEN_r <= VSAEN_nr1;
+        end
+    end
+    assign VSAEN = VSAEN_r; // VSAEN直接输出到FPGA外部，不返回主时钟域
 
 endmodule
