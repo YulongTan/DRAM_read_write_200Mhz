@@ -23,6 +23,7 @@
 module DRAM_write_read_16core(
     input wire clk_100m,
     input wire clk_200m,
+    input wire clk_400m,
     input wire clk_vsa,
     input wire rst_n,
     // 使能读写
@@ -2557,17 +2558,37 @@ module DRAM_write_read_16core(
     
     assign LIM_IN=DATA_IN_r;     // LIM_IN, LIM输入 16块芯片的算输入数据
     assign LIM_SEL=CIM_model_r;  // 存算模式选择
-    // 插入逻辑门延时  具体延时多少是试出来的
-    reg RD_EN_r;
+    // 在400MHz时钟域产生单周期的RD_EN脉冲
+    reg RD_EN_pre_r;
+    reg RD_EN_r1;
+    reg RD_EN_r2;
+    reg RD_EN_r3; // 在400MHz域生成的单周期读使能
+    reg RD_EN_r4; // 在VSAEN生成后再打一拍的读使能
+    // 在200MHz域寄存RD_EN_pre并屏蔽写操作
     always @(posedge clk_200m or negedge rst_n) begin
         if(!rst_n) begin
-            RD_EN_r <= 1'b0;
+            RD_EN_pre_r <= 1'b0;
         end
         else begin
-            RD_EN_r <= RD_EN_pre & (~WR_flag);
+            RD_EN_pre_r <= RD_EN_pre & (~WR_flag);
         end
     end
-    assign RD_EN = RD_EN_r;
+    // 跨到400MHz域并生成一个400MHz时钟周期的脉冲
+    always @(posedge clk_400m or negedge rst_n) begin
+        if(!rst_n) begin
+            RD_EN_r1 <= 1'b0;
+            RD_EN_r2 <= 1'b0;
+            RD_EN_r3 <= 1'b0;
+            RD_EN_r4 <= 1'b0;
+        end
+        else begin
+            RD_EN_r1 <= RD_EN_pre_r;
+            RD_EN_r2 <= RD_EN_r1;
+            RD_EN_r3 <= RD_EN_r1 & (~RD_EN_r2); // 400MHz域的单周期脉冲
+            RD_EN_r4 <= RD_EN_r3; // RD_EN在给VSAEN赋值后再打一拍
+        end
+    end
+    assign RD_EN = RD_EN_r4;
     reg VSAEN_r;
     reg VSAEN_nr1;
     always @(posedge clk_vsa or negedge rst_n) begin
@@ -2576,7 +2597,7 @@ module DRAM_write_read_16core(
             VSAEN_nr1 <= 1'b0;
         end
         else begin
-            VSAEN_nr1 <= RD_EN;
+            VSAEN_nr1 <= RD_EN_r3; // VSAEN由RD_EN_r3相移获得
             VSAEN_r <= VSAEN_nr1;
         end
     end
