@@ -2,7 +2,8 @@ module uart_send(
     input	           clk,            
     input              uart_en,
     input       [ 7:0] uart_din,
-    output  reg        uart_txd
+    output  reg        uart_txd,
+    output             uart_busy
 );
     
 //parameter define
@@ -33,6 +34,7 @@ always @ (posedge clk) begin
 end
 
 assign uart_tx_busy = tx_flag;
+assign uart_busy    = uart_tx_busy;
 
 assign en_flag = (~uart_en_d1) & uart_en_d0;
 
