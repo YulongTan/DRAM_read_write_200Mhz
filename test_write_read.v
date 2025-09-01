@@ -181,21 +181,26 @@ module test_write_read(
     wire RD_DONE;
     wire WT_DONE;
 
-    // LED指示灯：DONE信号拉高后保持亮
-    reg rd_done_latch;
-    reg wt_done_latch;
-    assign RD_DONE_LED = rd_done_latch;
-    assign WT_DONE_LED = wt_done_latch;
+    // LED指示灯：DONE信号拉高后亮5秒
+    reg [31:0] rd_timer;
+    reg [31:0] wt_timer;
+    assign RD_DONE_LED = (rd_timer != 0);
+    assign WT_DONE_LED = (wt_timer != 0);
 
     always @(posedge clk_100m or negedge rst_n_locked) begin
         if (!rst_n_locked) begin
-            rd_done_latch <= 1'b0;
-            wt_done_latch <= 1'b0;
+            rd_timer <= 32'd0;
+            wt_timer <= 32'd0;
         end else begin
             if (RD_DONE)
-                rd_done_latch <= 1'b1;
+                rd_timer <= 32'd500_000_000;        // 5s at 100MHz
+            else if (rd_timer != 0)
+                rd_timer <= rd_timer - 1;
+
             if (WT_DONE)
-                wt_done_latch <= 1'b1;
+                wt_timer <= 32'd500_000_000;        // 5s at 100MHz
+            else if (wt_timer != 0)
+                wt_timer <= wt_timer - 1;
         end
     end
     
