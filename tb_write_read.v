@@ -70,7 +70,9 @@ module tb_write_read;
         // simulate button press to start write
         #200;
         IO_EN_button = 1'b0; // press
-        #20;
+
+        #11_000_000;
+
         IO_EN_button = 1'b1; // release
 
         // wait for write complete
