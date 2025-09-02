@@ -21,9 +21,11 @@
 
 
 module test_write_read(
-    input wire clk,  // 100MHz
+    // input wire clk,  // 100MHz
+    input wire clk_n,
+    input wire clk_p,
     input wire rst_n, 
-    input wire IO_EN_button,
+    input wire IO_EN_button, 
     // input wire [1:0] IO_MODEL, // IO模型选择
     input wire [16:1] DRAM16_data, // DRAM芯片输入数据
     output wire RD_DONE_LED, // DRAM_DATA_OUT done信号
@@ -31,15 +33,15 @@ module test_write_read(
     // DRAM_IO
     // IO数据DRAM➡FPGA
     // input wire [8:1] DRAM_data, // 单芯片
-    output wire [2:0]PC_data,      /// PC并转串控制信号 PC[0]=clk PC[1]=SR/LD# PC[2]=CLK_INV
+    (* mark_debug = "true" *)output wire [2:0]PC_data,      /// PC并转串控制信号 PC[0]=clk PC[1]=SR/LD# PC[2]=CLK_INV
     // IO控制FPGA➡DRAM
-    output wire ADD_IN,            // ADD_IN // WWL_ADD 输入 自带CP 1 to 6
-    output wire ADD_VALID_IN,      // A_VALID// WWL_ADD_VALID 输入地址使能
-    output wire [1:0]PC_D_IN,      /// D_IN 的串转并控制信号 PC_D_IN[1]为rst_n  PC_D_IN[0]为移位时钟
-    output wire [16:1]D_IN,        /// D_IN[1:16] // 16块芯片的DATA_I
-    output wire DATA_VALID_IN,     // D_VALIDv// WBL 输入数据使能
-    output wire clk_out,           // 相当于带使能的100MHz时钟
-    output wire WRI_EN,            // WRI_EN 写使能
+    (* mark_debug = "true" *)output wire ADD_IN,            // ADD_IN // WWL_ADD 输入 自带CP 1 to 6
+    (* mark_debug = "true" *)output wire ADD_VALID_IN,      // A_VALID// WWL_ADD_VALID 输入地址使能
+    (* mark_debug = "true" *)output wire [1:0]PC_D_IN,      /// D_IN 的串转并控制信号 PC_D_IN[1]为rst_n  PC_D_IN[0]为移位时钟
+    (* mark_debug = "true" *)output wire [16:1]D_IN,        /// D_IN[1:16] // 16块芯片的DATA_I
+    (* mark_debug = "true" *)output wire DATA_VALID_IN,     // D_VALIDv// WBL 输入数据使能
+    (* mark_debug = "true" *)output wire clk_out,           // 相当于带使能的100MHz时钟
+    (* mark_debug = "true" *)output wire WRI_EN,            // WRI_EN 写使能
     output wire [16:1]R_AD,        ///R_AD 读/算地址 串转并后高两位是DE_ADD0 1
     output wire [1:0]PC_R_AD,      ///R_AD 的串转并控制信号
     output wire [16:1]LIM_IN,     /// LIM输入 16块芯片的算输入数据
@@ -48,8 +50,33 @@ module test_write_read(
     output wire RD_EN,         // 读使能 RWL_EN
     output wire VSAEN,
     output wire REF_WWL,
-    output wire uart_txd        // 串口发送脚
-);
+    output wire uart_txd,        // 串口发送脚
+    //
+    // input wire SW1, // rst_n
+    input wire SW2,
+    input wire SW3,
+    input wire SW4,
+    input wire SW5,
+    input wire SW6,
+    input wire SW7,
+    input wire SW8,
+    input wire SW9,
+    input wire SW10,
+    input wire SW11,
+    input wire SW12
+);  
+    (* mark_debug = "true" *)wire clk;
+    // 时钟输入
+    IBUFDS #(
+        .DIFF_TERM ("FALSE"),
+        .IBUF_LOW_PWR("TRUE"),
+        .IOSTANDARD("DEFAULT")
+    ) IBUFDS_inst (
+        .O (clk),
+        .I (clk_p),
+        .IB(clk_n)
+    );
+    
     // generate clock
     wire clk_400m;
     wire clk_100m;
@@ -66,15 +93,14 @@ module test_write_read(
         .clk(clk)
     );
     // 信号定义
-
     // 按键消抖及脉冲生成
+    wire btn_raw = ~IO_EN_button; // active-low button
     reg btn_sync0, btn_sync1;
     reg [19:0] debounce_cnt;
     reg btn_state;
     reg btn_state_d;
-    wire IO_EN;
-
-    // reg
+    (* mark_debug = "true" *)wire IO_EN;
+    // reg 
     reg [1:0] IO_MODEL;
     reg [1:0] CIM_model;
     reg [16:1] DATA_IN;
@@ -129,7 +155,7 @@ module test_write_read(
     reg [1:0] DEMUX_ADD15;
     reg [1:0] DEMUX_ADD16;
     reg DEMUX_ADD_3;
-    // 按键消抖逻辑
+    //
     always @(posedge clk_100m or negedge rst_n_locked) begin
         if (!rst_n_locked) begin
             btn_sync0    <= 1'b0;
@@ -139,7 +165,7 @@ module test_write_read(
             btn_state_d  <= 1'b0;
         end else begin
             // 同步到时钟域
-            btn_sync0 <= IO_EN_button;
+            btn_sync0 <= btn_raw;
             btn_sync1 <= btn_sync0;
 
             // 消抖计数
@@ -152,14 +178,12 @@ module test_write_read(
             end else begin
                 debounce_cnt <= 20'd0;
             end
-
             // 产生脉冲
             btn_state_d <= btn_state;
         end
     end
 
     assign IO_EN = btn_state & ~btn_state_d;
-
     // 输出
     wire [7:0] DRAM_DATA_OUT1 ;
     wire [7:0] DRAM_DATA_OUT2 ;
@@ -179,9 +203,27 @@ module test_write_read(
     wire [7:0] DRAM_DATA_OUT16;
     wire RD_DONE;
     wire WT_DONE;
-    // LED指示灯
-    assign RD_DONE_LED = RD_DONE;
-    assign WT_DONE_LED = WT_DONE;
+    // LED指示灯：DONE信号拉高后亮5秒
+    reg [31:0] rd_timer;
+    reg [31:0] wt_timer;
+    assign RD_DONE_LED = (rd_timer != 0);
+    assign WT_DONE_LED = (wt_timer != 0);
+
+    always @(posedge clk_100m or negedge rst_n_locked) begin
+        if (!rst_n_locked) begin
+            rd_timer <= 32'd0;
+            wt_timer <= 32'd0;
+        end else begin
+            if (RD_DONE)
+                rd_timer <= 32'd500_000_000;        // 5s at 100MHz
+            else if (rd_timer != 0)
+                rd_timer <= rd_timer - 1;
+            if (WT_DONE)
+                wt_timer <= 32'd500_000_000;        // 5s at 100MHz
+            else if (wt_timer != 0)
+                wt_timer <= wt_timer - 1;
+        end
+    end
     
 
     always @(posedge clk_100m or negedge rst_n) begin
