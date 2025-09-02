@@ -616,7 +616,7 @@ module DRAM_write_read_16core(
             WT_DONE_nr1 <= WT_DONE_r; WT_DONE <= WT_DONE_nr1;
         end
     end
-    assign DE_ADD3 = DEMUX_ADD3_r;
+    assign DE_ADD3 = DEMUX_ADD_3_r;
     always @(posedge clk_200m or negedge rst_n)begin
         if(!rst_n)begin 
             counter_work<=13'd0;
@@ -2150,7 +2150,7 @@ module DRAM_write_read_16core(
                 13'd1639: begin end
                 13'd1641: begin WRI_EN<=0; WR_flag<=0; end
                 13'd1643: begin  WT_DONE_r <= 1; end
-                13'd1645: begin  WT_DONE_r <= 0; end
+                13'd1644: begin  WT_DONE_r <= 0; end
                 default: begin end
                 endcase
             end
@@ -2214,163 +2214,163 @@ module DRAM_write_read_16core(
                     PC_DATA_SHLD <= 1'b0;
                 end
                 13'd1: begin
-                    R_AD[1] <=  DEMUX_ADD1 [1]; 
-                    R_AD[2] <=  DEMUX_ADD2 [1]; 
-                    R_AD[3] <=  DEMUX_ADD3 [1]; 
-                    R_AD[4] <=  DEMUX_ADD4 [1]; 
-                    R_AD[5] <=  DEMUX_ADD5 [1]; 
-                    R_AD[6] <=  DEMUX_ADD6 [1]; 
-                    R_AD[7] <=  DEMUX_ADD7 [1]; 
-                    R_AD[8] <=  DEMUX_ADD8 [1]; 
-                    R_AD[9] <=  DEMUX_ADD9 [1]; 
-                    R_AD[10] <= DEMUX_ADD10[1]; 
-                    R_AD[11] <= DEMUX_ADD11[1]; 
-                    R_AD[12] <= DEMUX_ADD12[1]; 
-                    R_AD[13] <= DEMUX_ADD13[1]; 
-                    R_AD[14] <= DEMUX_ADD14[1]; 
-                    R_AD[15] <= DEMUX_ADD15[1]; 
-                    R_AD[16] <= DEMUX_ADD16[1]; 
+                    R_AD[1] <=  DEMUX_ADD1_r [1]; 
+                    R_AD[2] <=  DEMUX_ADD2_r [1]; 
+                    R_AD[3] <=  DEMUX_ADD3_r [1]; 
+                    R_AD[4] <=  DEMUX_ADD4_r [1]; 
+                    R_AD[5] <=  DEMUX_ADD5_r [1]; 
+                    R_AD[6] <=  DEMUX_ADD6_r [1]; 
+                    R_AD[7] <=  DEMUX_ADD7_r [1]; 
+                    R_AD[8] <=  DEMUX_ADD8_r [1]; 
+                    R_AD[9] <=  DEMUX_ADD9_r [1]; 
+                    R_AD[10] <= DEMUX_ADD10_r[1]; 
+                    R_AD[11] <= DEMUX_ADD11_r[1]; 
+                    R_AD[12] <= DEMUX_ADD12_r[1]; 
+                    R_AD[13] <= DEMUX_ADD13_r[1]; 
+                    R_AD[14] <= DEMUX_ADD14_r[1]; 
+                    R_AD[15] <= DEMUX_ADD15_r[1]; 
+                    R_AD[16] <= DEMUX_ADD16_r[1]; 
                 end
                 13'd10: begin PC_R_AD[1] <= 1'b1; end// 取消复位
                 13'd20: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd30: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  DEMUX_ADD1 [0]; 
-                    R_AD[2] <=  DEMUX_ADD2 [0]; 
-                    R_AD[3] <=  DEMUX_ADD3 [0]; 
-                    R_AD[4] <=  DEMUX_ADD4 [0]; 
-                    R_AD[5] <=  DEMUX_ADD5 [0]; 
-                    R_AD[6] <=  DEMUX_ADD6 [0]; 
-                    R_AD[7] <=  DEMUX_ADD7 [0]; 
-                    R_AD[8] <=  DEMUX_ADD8 [0]; 
-                    R_AD[9] <=  DEMUX_ADD9 [0]; 
-                    R_AD[10] <= DEMUX_ADD10[0]; 
-                    R_AD[11] <= DEMUX_ADD11[0]; 
-                    R_AD[12] <= DEMUX_ADD12[0]; 
-                    R_AD[13] <= DEMUX_ADD13[0]; 
-                    R_AD[14] <= DEMUX_ADD14[0]; 
-                    R_AD[15] <= DEMUX_ADD15[0]; 
-                    R_AD[16] <= DEMUX_ADD16[0];
+                    R_AD[1] <=  DEMUX_ADD1_r [0]; 
+                    R_AD[2] <=  DEMUX_ADD2_r [0]; 
+                    R_AD[3] <=  DEMUX_ADD3_r [0]; 
+                    R_AD[4] <=  DEMUX_ADD4_r [0]; 
+                    R_AD[5] <=  DEMUX_ADD5_r [0]; 
+                    R_AD[6] <=  DEMUX_ADD6_r [0]; 
+                    R_AD[7] <=  DEMUX_ADD7_r [0]; 
+                    R_AD[8] <=  DEMUX_ADD8_r [0]; 
+                    R_AD[9] <=  DEMUX_ADD9_r [0]; 
+                    R_AD[10] <= DEMUX_ADD10_r[0]; 
+                    R_AD[11] <= DEMUX_ADD11_r[0]; 
+                    R_AD[12] <= DEMUX_ADD12_r[0]; 
+                    R_AD[13] <= DEMUX_ADD13_r[0]; 
+                    R_AD[14] <= DEMUX_ADD14_r[0]; 
+                    R_AD[15] <= DEMUX_ADD15_r[0]; 
+                    R_AD[16] <= DEMUX_ADD16_r[0];
                 end 
                 13'd40: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd50: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  RWL_DEC_ADD1 [5]; 
-                    R_AD[2] <=  RWL_DEC_ADD2 [5]; 
-                    R_AD[3] <=  RWL_DEC_ADD3 [5]; 
-                    R_AD[4] <=  RWL_DEC_ADD4 [5]; 
-                    R_AD[5] <=  RWL_DEC_ADD5 [5]; 
-                    R_AD[6] <=  RWL_DEC_ADD6 [5]; 
-                    R_AD[7] <=  RWL_DEC_ADD7 [5]; 
-                    R_AD[8] <=  RWL_DEC_ADD8 [5]; 
-                    R_AD[9] <=  RWL_DEC_ADD9 [5]; 
-                    R_AD[10] <= RWL_DEC_ADD10[5]; 
-                    R_AD[11] <= RWL_DEC_ADD11[5]; 
-                    R_AD[12] <= RWL_DEC_ADD12[5]; 
-                    R_AD[13] <= RWL_DEC_ADD13[5]; 
-                    R_AD[14] <= RWL_DEC_ADD14[5]; 
-                    R_AD[15] <= RWL_DEC_ADD15[5]; 
-                    R_AD[16] <= RWL_DEC_ADD16[5];                     
+                    R_AD[1] <=  RWL_DEC_ADD1_r [5]; 
+                    R_AD[2] <=  RWL_DEC_ADD2_r [5]; 
+                    R_AD[3] <=  RWL_DEC_ADD3_r [5]; 
+                    R_AD[4] <=  RWL_DEC_ADD4_r [5]; 
+                    R_AD[5] <=  RWL_DEC_ADD5_r [5]; 
+                    R_AD[6] <=  RWL_DEC_ADD6_r [5]; 
+                    R_AD[7] <=  RWL_DEC_ADD7_r [5]; 
+                    R_AD[8] <=  RWL_DEC_ADD8_r [5]; 
+                    R_AD[9] <=  RWL_DEC_ADD9_r [5]; 
+                    R_AD[10] <= RWL_DEC_ADD10_r[5]; 
+                    R_AD[11] <= RWL_DEC_ADD11_r[5]; 
+                    R_AD[12] <= RWL_DEC_ADD12_r[5]; 
+                    R_AD[13] <= RWL_DEC_ADD13_r[5]; 
+                    R_AD[14] <= RWL_DEC_ADD14_r[5]; 
+                    R_AD[15] <= RWL_DEC_ADD15_r[5]; 
+                    R_AD[16] <= RWL_DEC_ADD16_r[5];                     
                 end 
                 13'd60: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd70: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  RWL_DEC_ADD1 [4]; 
-                    R_AD[2] <=  RWL_DEC_ADD2 [4]; 
-                    R_AD[3] <=  RWL_DEC_ADD3 [4]; 
-                    R_AD[4] <=  RWL_DEC_ADD4 [4]; 
-                    R_AD[5] <=  RWL_DEC_ADD5 [4]; 
-                    R_AD[6] <=  RWL_DEC_ADD6 [4]; 
-                    R_AD[7] <=  RWL_DEC_ADD7 [4]; 
-                    R_AD[8] <=  RWL_DEC_ADD8 [4]; 
-                    R_AD[9] <=  RWL_DEC_ADD9 [4]; 
-                    R_AD[10] <= RWL_DEC_ADD10[4]; 
-                    R_AD[11] <= RWL_DEC_ADD11[4]; 
-                    R_AD[12] <= RWL_DEC_ADD12[4]; 
-                    R_AD[13] <= RWL_DEC_ADD13[4]; 
-                    R_AD[14] <= RWL_DEC_ADD14[4]; 
-                    R_AD[15] <= RWL_DEC_ADD15[4]; 
-                    R_AD[16] <= RWL_DEC_ADD16[4];                     
+                    R_AD[1] <=  RWL_DEC_ADD1_r [4]; 
+                    R_AD[2] <=  RWL_DEC_ADD2_r [4]; 
+                    R_AD[3] <=  RWL_DEC_ADD3_r [4]; 
+                    R_AD[4] <=  RWL_DEC_ADD4_r [4]; 
+                    R_AD[5] <=  RWL_DEC_ADD5_r [4]; 
+                    R_AD[6] <=  RWL_DEC_ADD6_r [4]; 
+                    R_AD[7] <=  RWL_DEC_ADD7_r [4]; 
+                    R_AD[8] <=  RWL_DEC_ADD8_r [4]; 
+                    R_AD[9] <=  RWL_DEC_ADD9_r [4]; 
+                    R_AD[10] <= RWL_DEC_ADD10_r[4]; 
+                    R_AD[11] <= RWL_DEC_ADD11_r[4]; 
+                    R_AD[12] <= RWL_DEC_ADD12_r[4]; 
+                    R_AD[13] <= RWL_DEC_ADD13_r[4]; 
+                    R_AD[14] <= RWL_DEC_ADD14_r[4]; 
+                    R_AD[15] <= RWL_DEC_ADD15_r[4]; 
+                    R_AD[16] <= RWL_DEC_ADD16_r[4];                     
                 end 
                 13'd80: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd90: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  RWL_DEC_ADD1 [3]; 
-                    R_AD[2] <=  RWL_DEC_ADD2 [3]; 
-                    R_AD[3] <=  RWL_DEC_ADD3 [3]; 
-                    R_AD[4] <=  RWL_DEC_ADD4 [3]; 
-                    R_AD[5] <=  RWL_DEC_ADD5 [3]; 
-                    R_AD[6] <=  RWL_DEC_ADD6 [3]; 
-                    R_AD[7] <=  RWL_DEC_ADD7 [3]; 
-                    R_AD[8] <=  RWL_DEC_ADD8 [3]; 
-                    R_AD[9] <=  RWL_DEC_ADD9 [3]; 
-                    R_AD[10] <= RWL_DEC_ADD10[3]; 
-                    R_AD[11] <= RWL_DEC_ADD11[3]; 
-                    R_AD[12] <= RWL_DEC_ADD12[3]; 
-                    R_AD[13] <= RWL_DEC_ADD13[3]; 
-                    R_AD[14] <= RWL_DEC_ADD14[3]; 
-                    R_AD[15] <= RWL_DEC_ADD15[3]; 
-                    R_AD[16] <= RWL_DEC_ADD16[3];                     
+                    R_AD[1] <=  RWL_DEC_ADD1_r [3]; 
+                    R_AD[2] <=  RWL_DEC_ADD2_r [3]; 
+                    R_AD[3] <=  RWL_DEC_ADD3_r [3]; 
+                    R_AD[4] <=  RWL_DEC_ADD4_r [3]; 
+                    R_AD[5] <=  RWL_DEC_ADD5_r [3]; 
+                    R_AD[6] <=  RWL_DEC_ADD6_r [3]; 
+                    R_AD[7] <=  RWL_DEC_ADD7_r [3]; 
+                    R_AD[8] <=  RWL_DEC_ADD8_r [3]; 
+                    R_AD[9] <=  RWL_DEC_ADD9_r [3]; 
+                    R_AD[10] <= RWL_DEC_ADD10_r[3]; 
+                    R_AD[11] <= RWL_DEC_ADD11_r[3]; 
+                    R_AD[12] <= RWL_DEC_ADD12_r[3]; 
+                    R_AD[13] <= RWL_DEC_ADD13_r[3]; 
+                    R_AD[14] <= RWL_DEC_ADD14_r[3]; 
+                    R_AD[15] <= RWL_DEC_ADD15_r[3]; 
+                    R_AD[16] <= RWL_DEC_ADD16_r[3];                     
                 end 
                 13'd100: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd110: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  RWL_DEC_ADD1 [2]; 
-                    R_AD[2] <=  RWL_DEC_ADD2 [2]; 
-                    R_AD[3] <=  RWL_DEC_ADD3 [2]; 
-                    R_AD[4] <=  RWL_DEC_ADD4 [2]; 
-                    R_AD[5] <=  RWL_DEC_ADD5 [2]; 
-                    R_AD[6] <=  RWL_DEC_ADD6 [2]; 
-                    R_AD[7] <=  RWL_DEC_ADD7 [2]; 
-                    R_AD[8] <=  RWL_DEC_ADD8 [2]; 
-                    R_AD[9] <=  RWL_DEC_ADD9 [2]; 
-                    R_AD[10] <= RWL_DEC_ADD10[2]; 
-                    R_AD[11] <= RWL_DEC_ADD11[2]; 
-                    R_AD[12] <= RWL_DEC_ADD12[2]; 
-                    R_AD[13] <= RWL_DEC_ADD13[2]; 
-                    R_AD[14] <= RWL_DEC_ADD14[2]; 
-                    R_AD[15] <= RWL_DEC_ADD15[2]; 
-                    R_AD[16] <= RWL_DEC_ADD16[2];                     
+                    R_AD[1] <=  RWL_DEC_ADD1_r [2]; 
+                    R_AD[2] <=  RWL_DEC_ADD2_r [2]; 
+                    R_AD[3] <=  RWL_DEC_ADD3_r [2]; 
+                    R_AD[4] <=  RWL_DEC_ADD4_r [2]; 
+                    R_AD[5] <=  RWL_DEC_ADD5_r [2]; 
+                    R_AD[6] <=  RWL_DEC_ADD6_r [2]; 
+                    R_AD[7] <=  RWL_DEC_ADD7_r [2]; 
+                    R_AD[8] <=  RWL_DEC_ADD8_r [2]; 
+                    R_AD[9] <=  RWL_DEC_ADD9_r [2]; 
+                    R_AD[10] <= RWL_DEC_ADD10_r[2]; 
+                    R_AD[11] <= RWL_DEC_ADD11_r[2]; 
+                    R_AD[12] <= RWL_DEC_ADD12_r[2]; 
+                    R_AD[13] <= RWL_DEC_ADD13_r[2]; 
+                    R_AD[14] <= RWL_DEC_ADD14_r[2]; 
+                    R_AD[15] <= RWL_DEC_ADD15_r[2]; 
+                    R_AD[16] <= RWL_DEC_ADD16_r[2];                     
                 end 
                 13'd120: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd130: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  RWL_DEC_ADD1 [1]; 
-                    R_AD[2] <=  RWL_DEC_ADD2 [1]; 
-                    R_AD[3] <=  RWL_DEC_ADD3 [1]; 
-                    R_AD[4] <=  RWL_DEC_ADD4 [1]; 
-                    R_AD[5] <=  RWL_DEC_ADD5 [1]; 
-                    R_AD[6] <=  RWL_DEC_ADD6 [1]; 
-                    R_AD[7] <=  RWL_DEC_ADD7 [1]; 
-                    R_AD[8] <=  RWL_DEC_ADD8 [1]; 
-                    R_AD[9] <=  RWL_DEC_ADD9 [1]; 
-                    R_AD[10] <= RWL_DEC_ADD10[1]; 
-                    R_AD[11] <= RWL_DEC_ADD11[1]; 
-                    R_AD[12] <= RWL_DEC_ADD12[1]; 
-                    R_AD[13] <= RWL_DEC_ADD13[1]; 
-                    R_AD[14] <= RWL_DEC_ADD14[1]; 
-                    R_AD[15] <= RWL_DEC_ADD15[1]; 
-                    R_AD[16] <= RWL_DEC_ADD16[1];                     
+                    R_AD[1] <=  RWL_DEC_ADD1_r [1]; 
+                    R_AD[2] <=  RWL_DEC_ADD2_r [1]; 
+                    R_AD[3] <=  RWL_DEC_ADD3_r [1]; 
+                    R_AD[4] <=  RWL_DEC_ADD4_r [1]; 
+                    R_AD[5] <=  RWL_DEC_ADD5_r [1]; 
+                    R_AD[6] <=  RWL_DEC_ADD6_r [1]; 
+                    R_AD[7] <=  RWL_DEC_ADD7_r [1]; 
+                    R_AD[8] <=  RWL_DEC_ADD8_r [1]; 
+                    R_AD[9] <=  RWL_DEC_ADD9_r [1]; 
+                    R_AD[10] <= RWL_DEC_ADD10_r[1]; 
+                    R_AD[11] <= RWL_DEC_ADD11_r[1]; 
+                    R_AD[12] <= RWL_DEC_ADD12_r[1]; 
+                    R_AD[13] <= RWL_DEC_ADD13_r[1]; 
+                    R_AD[14] <= RWL_DEC_ADD14_r[1]; 
+                    R_AD[15] <= RWL_DEC_ADD15_r[1]; 
+                    R_AD[16] <= RWL_DEC_ADD16_r[1];                     
                 end 
                 13'd140: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿 
                 13'd150: begin 
                     PC_R_AD[0] <= 1'b0; 
-                    R_AD[1] <=  RWL_DEC_ADD1 [0]; 
-                    R_AD[2] <=  RWL_DEC_ADD2 [0]; 
-                    R_AD[3] <=  RWL_DEC_ADD3 [0]; 
-                    R_AD[4] <=  RWL_DEC_ADD4 [0]; 
-                    R_AD[5] <=  RWL_DEC_ADD5 [0]; 
-                    R_AD[6] <=  RWL_DEC_ADD6 [0]; 
-                    R_AD[7] <=  RWL_DEC_ADD7 [0]; 
-                    R_AD[8] <=  RWL_DEC_ADD8 [0]; 
-                    R_AD[9] <=  RWL_DEC_ADD9 [0]; 
-                    R_AD[10] <= RWL_DEC_ADD10[0]; 
-                    R_AD[11] <= RWL_DEC_ADD11[0]; 
-                    R_AD[12] <= RWL_DEC_ADD12[0]; 
-                    R_AD[13] <= RWL_DEC_ADD13[0]; 
-                    R_AD[14] <= RWL_DEC_ADD14[0]; 
-                    R_AD[15] <= RWL_DEC_ADD15[0]; 
-                    R_AD[16] <= RWL_DEC_ADD16[0];                     
+                    R_AD[1] <=  RWL_DEC_ADD1_r [0]; 
+                    R_AD[2] <=  RWL_DEC_ADD2_r [0]; 
+                    R_AD[3] <=  RWL_DEC_ADD3_r [0]; 
+                    R_AD[4] <=  RWL_DEC_ADD4_r [0]; 
+                    R_AD[5] <=  RWL_DEC_ADD5_r [0]; 
+                    R_AD[6] <=  RWL_DEC_ADD6_r [0]; 
+                    R_AD[7] <=  RWL_DEC_ADD7_r [0]; 
+                    R_AD[8] <=  RWL_DEC_ADD8_r [0]; 
+                    R_AD[9] <=  RWL_DEC_ADD9_r [0]; 
+                    R_AD[10] <= RWL_DEC_ADD10_r[0]; 
+                    R_AD[11] <= RWL_DEC_ADD11_r[0]; 
+                    R_AD[12] <= RWL_DEC_ADD12_r[0]; 
+                    R_AD[13] <= RWL_DEC_ADD13_r[0]; 
+                    R_AD[14] <= RWL_DEC_ADD14_r[0]; 
+                    R_AD[15] <= RWL_DEC_ADD15_r[0]; 
+                    R_AD[16] <= RWL_DEC_ADD16_r[0];                     
                 end 
                 13'd160: begin PC_R_AD[0] <= 1'b1; end // CLK上升沿
                 13'd170: begin PC_R_AD[0] <= 1'b0; end
@@ -2558,6 +2558,7 @@ module DRAM_write_read_16core(
     
     assign LIM_IN=DATA_IN_r;     // LIM_IN, LIM输入 16块芯片的算输入数据
     assign LIM_SEL=CIM_model_r;  // 存算模式选择
+
     // 在400MHz时钟域产生单周期的RD_EN脉冲
     reg RD_EN_pre_r;
     reg RD_EN_r1;
