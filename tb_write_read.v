@@ -70,8 +70,9 @@ module tb_write_read;
         // simulate button press to start write
         #200;
         IO_EN_button = 1'b0; // press
-        // hold the button for ~11ms to pass debounce logic (100MHz clock)
+
         #11_000_000;
+
         IO_EN_button = 1'b1; // release
 
         // wait for write complete
